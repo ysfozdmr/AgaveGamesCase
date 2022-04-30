@@ -12,9 +12,11 @@ GameObject:
   - component: {fileID: 61061071608163176}
   - component: {fileID: 2827163190853361570}
   - component: {fileID: 3081324199190497245}
+  - component: {fileID: 1896339151368862903}
+  - component: {fileID: 1039243781482249987}
   m_Layer: 0
   m_Name: Obstacle_02
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -104,3 +106,31 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!136 &1896339151368862903
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4340596484273634935}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 0.2
+  m_Height: 7.26
+  m_Direction: 0
+  m_Center: {x: 4.04, y: 0.25, z: 0}
+--- !u!136 &1039243781482249987
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4340596484273634935}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 0.2
+  m_Height: 7.26
+  m_Direction: 0
+  m_Center: {x: -4.05, y: 0.25, z: 0}
