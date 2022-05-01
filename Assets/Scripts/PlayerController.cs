@@ -10,19 +10,25 @@ public class PlayerController : MonoBehaviour
     [Header("Bools")] public bool isLevelStart;
     public bool isLevelDone;
     public bool isLevelFail;
+    public bool objectDone;
+    
     [Header("Tags")] string TagObstacle;
     string TagTurningObstacle;
     string TagSwingingObstacle;
     string TagChangeBack;
-    string TagTurningTrigger;
+    string TagFinish;
 
     [Header("Movement Settings")] public float movementSpeed;
     Animator playerAnimCont;
     SplineFollower splineFollower;
 
-    [Header("Camera Settings")] public CinemachineVirtualCamera turningObjectCam;
+    [Header("Camera Settings")]
+    public CinemachineVirtualCamera turningObjectCam;
     public CinemachineVirtualCamera swingingObjectCam;
     public List<GameObject> FailingCubes = new List<GameObject>();
+    public CinemachineVirtualCamera finishCam;
+
+    public List<float> RestartPlaces = new List<float>();
     private int index;
 
     GameController GC;
@@ -57,7 +63,7 @@ public class PlayerController : MonoBehaviour
         TagChangeBack = GC.TagChangeBack;
         TagSwingingObstacle = GC.TagSwingingObstacle;
         TagTurningObstacle = GC.TagTurningObstacle;
-        TagTurningTrigger = GC.TagTurningTrigger;
+        TagFinish=GC.TagFinish;
     }
 
     // Update is called once per frame
@@ -86,30 +92,28 @@ public class PlayerController : MonoBehaviour
 
         if (other.gameObject.CompareTag(TagChangeBack))
         {
+            objectDone = true;
             swingingObjectCam.Priority = 9;
             turningObjectCam.Priority = 9;
-            index++;
+            FailingCubes.RemoveAt(0);
+            RestartPlaces.RemoveAt(0);
+        }
+        if(other.gameObject.CompareTag(TagFinish))
+        {
+            finishCam.Priority = 11;    
+            playerAnimCont.SetTrigger("LevelEnd");
+            splineFollower.enabled = false;
         }
     }
-
-    public void splinechanger()
-    {
-        splineFollower.Restart(0.19f);
-    }
+    
     IEnumerator FailingCor()
     {
-        yield return new WaitForSeconds(1.5f);
-        if (index == 0)
-        {
-            playerAnimCont.enabled = true;
-            transform.position = FailingCubes[0].gameObject.transform.position;
-            splineFollower.Restart(0.19f);
-        }
-        else if (index == 1)
-        {
-            playerAnimCont.enabled = true;
-            transform.position = FailingCubes[1].gameObject.transform.position;
-        }
+        yield return new WaitForSeconds(1.5f); 
+        
+        playerAnimCont.enabled = true; 
+        transform.position = FailingCubes[0].gameObject.transform.position;
+        splineFollower.Restart(RestartPlaces[0]);
+
     }
     
     void Movement()

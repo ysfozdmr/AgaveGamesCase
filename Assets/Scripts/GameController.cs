@@ -15,7 +15,7 @@ public class GameController : MonoBehaviour
     public string TagTurningObstacle;
     public string TagSwingingObstacle;
     public string TagChangeBack;
-    public string TagTurningTrigger;
+    public string TagFinish;
 
     public int lastLevel;
     private int isFirstLevelFirstlyCompleted;

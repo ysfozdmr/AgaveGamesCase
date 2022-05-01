@@ -308,6 +308,12 @@
  <Reference Include="unityplastic">
  <HintPath>C:/Users/efe/Documents/GitHub/AgaveGamesCase/Library/PackageCache/com.unity.collab-proxy@1.15.16/Lib/Editor/PlasticSCM/unityplastic.dll</HintPath>
  </Reference>
+ <Reference Include="DOTweenEditor">
+ <HintPath>C:/Users/efe/Documents/GitHub/AgaveGamesCase/Assets/Plugins/Demigiant/DOTween/Editor/DOTweenEditor.dll</HintPath>
+ </Reference>
+ <Reference Include="DOTween">
+ <HintPath>C:/Users/efe/Documents/GitHub/AgaveGamesCase/Assets/Plugins/Demigiant/DOTween/DOTween.dll</HintPath>
+ </Reference>
  <Reference Include="nunit.framework">
  <HintPath>C:/Users/efe/Documents/GitHub/AgaveGamesCase/Library/PackageCache/com.unity.ext.nunit@1.0.6/net35/unity-custom/nunit.framework.dll</HintPath>
  </Reference>
@@ -709,6 +715,10 @@
  </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
+      <Project>{f93cf883-5d47-eb1f-cb18-7a2a9416b92b}</Project>
+      <Name>Assembly-CSharp-firstpass</Name>
+    </ProjectReference>
     <ProjectReference Include="Assembly-CSharp.csproj">
       <Project>{b5a211ff-3166-7bc1-ed56-547c217b2093}</Project>
       <Name>Assembly-CSharp</Name>
