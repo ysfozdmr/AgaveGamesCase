@@ -24,8 +24,9 @@ public class GameController : MonoBehaviour
     public int randomLevelIndex;
     
     public static GameController instance;
-   // UIController UI;
+    UIController UI;
     PlayerController player;
+    private AIScript AI;
     private void Awake()
     {
         instance = this;
@@ -39,8 +40,9 @@ public class GameController : MonoBehaviour
     }
     void startMethods()
     {
-     //   UI = UIController.instance;
+        UI = UIController.instance;
         player = PlayerController.instance;
+        AI = AIScript.instance;
     }
     public void tapToStartAction()
     {
@@ -48,9 +50,11 @@ public class GameController : MonoBehaviour
     }
     void sendLevelStart()
     {
-        //UI.isLevelStart = true;
+        UI.isLevelStart = true;
         //UI.inGamePanel.SetActive(true);
         isLevelStart = true;
+        player.isLevelStart = true;
+        AI.isLevelStart = true;
     }
     public void completeLevel()
     {

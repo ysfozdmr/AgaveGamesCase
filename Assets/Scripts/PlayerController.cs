@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     public bool isLevelDone;
     public bool isLevelFail;
     public bool objectDone;
-    
+
     [Header("Tags")] string TagObstacle;
     string TagTurningObstacle;
     string TagSwingingObstacle;
@@ -22,8 +22,7 @@ public class PlayerController : MonoBehaviour
     Animator playerAnimCont;
     SplineFollower splineFollower;
 
-    [Header("Camera Settings")]
-    public CinemachineVirtualCamera turningObjectCam;
+    [Header("Camera Settings")] public CinemachineVirtualCamera turningObjectCam;
     public CinemachineVirtualCamera swingingObjectCam;
     public List<GameObject> FailingCubes = new List<GameObject>();
     public CinemachineVirtualCamera finishCam;
@@ -55,7 +54,6 @@ public class PlayerController : MonoBehaviour
         GetTags();
     }
 
-  
 
     void GetTags()
     {
@@ -63,7 +61,7 @@ public class PlayerController : MonoBehaviour
         TagChangeBack = GC.TagChangeBack;
         TagSwingingObstacle = GC.TagSwingingObstacle;
         TagTurningObstacle = GC.TagTurningObstacle;
-        TagFinish=GC.TagFinish;
+        TagFinish = GC.TagFinish;
     }
 
     // Update is called once per frame
@@ -76,6 +74,7 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject.CompareTag(TagObstacle))
         {
+            splineFollower.followSpeed = 0f;
             playerAnimCont.enabled = false;
             StartCoroutine(FailingCor());
         }
@@ -98,36 +97,39 @@ public class PlayerController : MonoBehaviour
             FailingCubes.RemoveAt(0);
             RestartPlaces.RemoveAt(0);
         }
-        if(other.gameObject.CompareTag(TagFinish))
+
+        if (other.gameObject.CompareTag(TagFinish))
         {
-            finishCam.Priority = 11;    
+            finishCam.Priority = 11;
             playerAnimCont.SetTrigger("LevelEnd");
             splineFollower.enabled = false;
         }
     }
-    
+
     IEnumerator FailingCor()
     {
-        yield return new WaitForSeconds(1.5f); 
-        
-        playerAnimCont.enabled = true; 
+        yield return new WaitForSeconds(1.5f);
+
+        splineFollower.followSpeed = movementSpeed;
+        playerAnimCont.enabled = true;
         transform.position = FailingCubes[0].gameObject.transform.position;
         splineFollower.Restart(RestartPlaces[0]);
-
     }
-    
+
     void Movement()
     {
-        if (Input.GetMouseButton(0))
+        if (isLevelStart && !isLevelDone && !isLevelFail)
         {
-            playerAnimCont.SetBool("isRunning", true);
-            splineFollower.enabled = true;
-            
-        }
-        else
-        {
-            playerAnimCont.SetBool("isRunning", false);
-            splineFollower.enabled = false;
+            if (Input.GetMouseButton(0))
+            {
+                playerAnimCont.SetBool("isRunning", true);
+                splineFollower.enabled = true;
+            }
+            else
+            {
+                playerAnimCont.SetBool("isRunning", false);
+                splineFollower.enabled = false;
+            }
         }
     }
 }
