@@ -17,6 +17,7 @@ public class GameController : MonoBehaviour
     public string TagChangeBack;
     public string TagFinish;
     public string TagCrouchingArea;
+    public string TagWheel;
 
     public int lastLevel;
     private int isFirstLevelFirstlyCompleted;

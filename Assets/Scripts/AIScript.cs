@@ -21,11 +21,14 @@ public class AIScript : MonoBehaviour
     public bool isLevelFail;
     public bool objectDone;
     public bool isItPause;
+    public bool isCrouching;
+    public bool isCrouchingArea;
 
     [Header("Tags")] string TagObstacle;
     string TagChangeBack;
     string TagFinish;
     string TagCrouchingArea;
+    string TagWheel;
 
     float timer;
     float timer2;
@@ -62,6 +65,7 @@ public class AIScript : MonoBehaviour
         playerAnimCont = GetComponent<Animator>();
         splineFollower.followSpeed = movementSpeed;
 
+
         GetTags();
     }
 
@@ -71,23 +75,37 @@ public class AIScript : MonoBehaviour
         TagObstacle = GC.TagObstacle;
         TagChangeBack = GC.TagChangeBack;
         TagCrouchingArea = GC.TagCrouchingArea;
+        TagWheel = GC.TagWheel;
         TagFinish = GC.TagFinish;
     }
 
-    void FixedUpdate()
+    void Update()
     {
-        Ray ray = new Ray(transform.position, transform.forward);
-
         RaycastHit hit;
 
         if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out hit, 4))
         {
             if (hit.collider.gameObject.CompareTag(TagObstacle))
             {
-                Debug.DrawRay(transform.position + Vector3.up, transform.forward);
+                Debug.DrawRay(transform.position + Vector3.up * 2, transform.forward);
                 if (state != State.Pause)
                 {
                     state = State.Pause;
+                }
+            }
+        }
+
+        if (isCrouchingArea)
+        {
+            if (Physics.Raycast(transform.position + Vector3.up, -transform.forward, out hit, 4f))
+            {
+                if (hit.collider.gameObject.CompareTag(TagObstacle))
+                {
+                    Debug.DrawRay(transform.position + Vector3.up * 2, transform.forward);
+                    if (state != State.Pause)
+                    {
+                        state = State.Pause;
+                    }
                 }
             }
         }
@@ -100,7 +118,16 @@ public class AIScript : MonoBehaviour
 
     IEnumerator Movement()
     {
-        playerAnimCont.SetBool("isRunning", true);
+        if (!isCrouchingArea)
+        {
+            playerAnimCont.SetBool("isRunning", true);
+        }
+        else
+        {
+            isCrouching = false;
+            playerAnimCont.SetBool("isCrouching", false);
+        }
+
         while (state == State.Run)
         {
             splineFollower.enabled = true;
@@ -116,7 +143,16 @@ public class AIScript : MonoBehaviour
     IEnumerator Pause()
     {
         isItPause = true;
-        playerAnimCont.SetBool("isRunning", false);
+        if (!isCrouchingArea)
+        {
+            playerAnimCont.SetBool("isRunning", false);
+        }
+        else
+        {
+            isCrouching = true;
+            playerAnimCont.SetBool("isCrouching", true);
+        }
+
         random = Random.Range(0.5f, 0.7f);
         while (state == State.Pause)
         {
@@ -146,15 +182,18 @@ public class AIScript : MonoBehaviour
     {
         if (other.gameObject.CompareTag(TagObstacle))
         {
-            splineFollower.followSpeed = 0f;
-            playerAnimCont.enabled = false;
-            StartCoroutine(FailingCor());
+            if (!isCrouching)
+            {
+                splineFollower.followSpeed = 0f;
+                playerAnimCont.enabled = false;
+                StartCoroutine(FailingCor());
+            }
         }
 
         if (other.gameObject.CompareTag(TagChangeBack))
         {
-            failingCount = 0;
-            objectDone = true;
+            isCrouching = false;
+            isCrouchingArea = false;
             FailingCubes.RemoveAt(0);
             RestartPlaces.RemoveAt(0);
         }
@@ -163,6 +202,30 @@ public class AIScript : MonoBehaviour
         {
             playerAnimCont.SetTrigger("LevelEnd");
             splineFollower.enabled = false;
+        }
+
+        if (other.gameObject.CompareTag(TagCrouchingArea))
+        {
+            playerAnimCont.SetTrigger("CrouchTrigger");
+            isCrouchingArea = true;
+        }
+
+        if (other.gameObject.CompareTag(TagWheel))
+        {
+            splineFollower.enabled = false;
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.CompareTag(TagObstacle))
+        {
+            if (!isCrouching)
+            {
+                splineFollower.followSpeed = 0f;
+                playerAnimCont.enabled = false;
+                StartCoroutine(FailingCor());
+            }
         }
     }
 

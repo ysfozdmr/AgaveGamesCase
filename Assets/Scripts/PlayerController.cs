@@ -11,13 +11,16 @@ public class PlayerController : MonoBehaviour
     public bool isLevelDone;
     public bool isLevelFail;
     public bool isCrouchingArea;
+    public bool isCrouching;
+    public bool isWheeling;
 
     [Header("Tags")] string TagObstacle;
     string TagTurningObstacle;
     string TagSwingingObstacle;
     string TagChangeBack;
-    private string TagCrouchingArea;
+    string TagCrouchingArea;
     string TagFinish;
+    string TagWheel;
 
     [Header("Movement Settings")] public float movementSpeed;
     Animator playerAnimCont;
@@ -27,6 +30,9 @@ public class PlayerController : MonoBehaviour
     public CinemachineVirtualCamera swingingObjectCam;
     public List<GameObject> FailingCubes = new List<GameObject>();
     public CinemachineVirtualCamera finishCam;
+    public CinemachineVirtualCamera crouchCam;
+    public CinemachineVirtualCamera wheelCam;
+    public List<CinemachineVirtualCamera> Cams = new List<CinemachineVirtualCamera>();
 
     public List<float> RestartPlaces = new List<float>();
     private int index;
@@ -63,6 +69,7 @@ public class PlayerController : MonoBehaviour
         TagSwingingObstacle = GC.TagSwingingObstacle;
         TagTurningObstacle = GC.TagTurningObstacle;
         TagCrouchingArea = GC.TagCrouchingArea;
+        TagWheel = GC.TagWheel;
         TagFinish = GC.TagFinish;
     }
 
@@ -76,9 +83,14 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject.CompareTag(TagObstacle))
         {
-            splineFollower.followSpeed = 0f;
-            playerAnimCont.enabled = false;
-            StartCoroutine(FailingCor());
+            Debug.Log("sa");
+            if (!isCrouching)
+            {
+                Debug.Log("as");
+                splineFollower.followSpeed = 0f;
+                playerAnimCont.enabled = false;
+                StartCoroutine(FailingCor());
+            }
         }
 
         if (other.gameObject.CompareTag(TagTurningObstacle))
@@ -93,8 +105,13 @@ public class PlayerController : MonoBehaviour
 
         if (other.gameObject.CompareTag(TagChangeBack))
         {
-            swingingObjectCam.Priority = 9;
-            turningObjectCam.Priority = 9;
+            isCrouching = false;
+            isCrouchingArea = false;
+            for (int i = 0; i < Cams.Count; i++)
+            {
+                Cams[i].Priority = 9;
+            }
+
             FailingCubes.RemoveAt(0);
             RestartPlaces.RemoveAt(0);
         }
@@ -109,7 +126,29 @@ public class PlayerController : MonoBehaviour
 
         if (other.gameObject.CompareTag(TagCrouchingArea))
         {
+            crouchCam.Priority = 11;
+            playerAnimCont.SetTrigger("CrouchTrigger");
             isCrouchingArea = true;
+        }
+
+        if (other.gameObject.CompareTag(TagWheel))
+        {
+            isWheeling = true;
+            wheelCam.Priority = 11;
+            splineFollower.enabled = false;
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.CompareTag(TagObstacle))
+        {
+            if (!isCrouching)
+            {
+                splineFollower.followSpeed = 0f;
+                playerAnimCont.enabled = false;
+                StartCoroutine(FailingCor());
+            }
         }
     }
 
@@ -135,27 +174,44 @@ public class PlayerController : MonoBehaviour
         {
             if (!isCrouchingArea)
             {
-                if (Input.GetMouseButton(0))
+                if (!isWheeling)
                 {
-                    playerAnimCont.SetBool("isRunning", true);
-                    splineFollower.enabled = true;
+                    if (Input.GetMouseButton(0))
+                    {
+                        playerAnimCont.SetBool("isRunning", true);
+                        splineFollower.enabled = true;
+                    }
+                    else
+                    {
+                        playerAnimCont.SetBool("isRunning", false);
+                        splineFollower.enabled = false;
+                    }
                 }
                 else
                 {
-                    playerAnimCont.SetBool("isRunning", false);
-                    splineFollower.enabled = false;
+                    if (Input.GetMouseButton(0))
+                    {
+                        playerAnimCont.SetBool("isRunning", true);
+                        transform.position+=-Vector3.forward/9;
+                    }
+                    else
+                    {
+                        playerAnimCont.SetBool("isRunning", false);
+                        
+                    }
                 }
             }
             else
             {
                 if (Input.GetMouseButton(0))
                 {
-                   // playerAnimCont.SetBool("isRunning", true);
+                    isCrouching = false;
                     playerAnimCont.SetBool("isCrouching", false);
                     splineFollower.enabled = true;
                 }
                 else
                 {
+                    isCrouching = true;
                     playerAnimCont.SetBool("isCrouching", true);
                     splineFollower.enabled = false;
                 }
