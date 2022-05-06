@@ -723,6 +723,10 @@
       <Project>{b5a211ff-3166-7bc1-ed56-547c217b2093}</Project>
       <Name>Assembly-CSharp</Name>
     </ProjectReference>
+    <ProjectReference Include="Boxophobic.Utils.Scripts.csproj">
+      <Project>{d2922745-6bb0-298e-8af6-228b357104bb}</Project>
+      <Name>Boxophobic.Utils.Scripts</Name>
+    </ProjectReference>
     <ProjectReference Include="Dreamteck.Splines.Editor.csproj">
       <Project>{9d70ea3c-7625-93e9-d53f-d02e93dbf5d1}</Project>
       <Name>Dreamteck.Splines.Editor</Name>
@@ -731,6 +735,10 @@
       <Project>{c3ef5710-7977-fafd-72d6-b906e1b064be}</Project>
       <Name>Dreamteck.Utilities.Editor</Name>
     </ProjectReference>
+    <ProjectReference Include="Boxophobic.Utils.Editor.csproj">
+      <Project>{bed320df-9d27-6b80-80b3-0d48ba0857c9}</Project>
+      <Name>Boxophobic.Utils.Editor</Name>
+    </ProjectReference>
     <ProjectReference Include="Dreamteck.Utilities.csproj">
       <Project>{8248358c-14d7-2422-59f3-7f511b9087f7}</Project>
       <Name>Dreamteck.Utilities</Name>
@@ -738,6 +746,14 @@
     <ProjectReference Include="Dreamteck.Splines.csproj">
       <Project>{c9b21461-740c-0334-de15-c9a614f86fb7}</Project>
       <Name>Dreamteck.Splines</Name>
+    </ProjectReference>
+    <ProjectReference Include="Boxophobic.PolyverseSkies.Editor.csproj">
+      <Project>{e5567036-de76-6d27-f221-461dbbd4fd9b}</Project>
+      <Name>Boxophobic.PolyverseSkies.Editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="Boxophobic.PolyverseSkies.Runtime.csproj">
+      <Project>{aedd6f12-c200-10a6-9757-ce8444df9585}</Project>
+      <Name>Boxophobic.PolyverseSkies.Runtime</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

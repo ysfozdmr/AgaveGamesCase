@@ -16,6 +16,7 @@ public class GameController : MonoBehaviour
     public string TagSwingingObstacle;
     public string TagChangeBack;
     public string TagFinish;
+    public string TagCrouchingArea;
 
     public int lastLevel;
     private int isFirstLevelFirstlyCompleted;
@@ -58,21 +59,18 @@ public class GameController : MonoBehaviour
     }
     public void completeLevel()
     {
-       // UI.inGamePanel.SetActive(false);
-      //  UI.completeLevelPanel.SetActive(true);
+       
+       UI.completeLevelPanel.SetActive(true);
         isLevelDone = true;
-       // UI.isLevelDone = true;
+        player.isLevelDone = true;
+       UI.isLevelDone = true;
         if (isFirstLevelFirstlyCompleted == 0)
         {
             isFirstLevelFirstlyCompleted = 1;
             PlayerPrefs.SetInt("firstlevelCompleted", isFirstLevelFirstlyCompleted);
         }
     }
-    public void levelFail()
-    {
-        isLevelFail = true;
-        //UI.isLevelFail = true;
-    }
+
 
     public void EndGameButtonAction()
     {

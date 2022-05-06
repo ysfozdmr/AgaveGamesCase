@@ -9,6 +9,8 @@ TagManager:
   - SwingingObstacle
   - ChangeBack
   - TurningTrigger
+  - CrouchingArea
+  - Wheel
   layers:
   - Default
   - TransparentFX

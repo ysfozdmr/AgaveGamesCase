@@ -10,12 +10,13 @@ public class PlayerController : MonoBehaviour
     [Header("Bools")] public bool isLevelStart;
     public bool isLevelDone;
     public bool isLevelFail;
-    public bool objectDone;
+    public bool isCrouchingArea;
 
     [Header("Tags")] string TagObstacle;
     string TagTurningObstacle;
     string TagSwingingObstacle;
     string TagChangeBack;
+    private string TagCrouchingArea;
     string TagFinish;
 
     [Header("Movement Settings")] public float movementSpeed;
@@ -61,6 +62,7 @@ public class PlayerController : MonoBehaviour
         TagChangeBack = GC.TagChangeBack;
         TagSwingingObstacle = GC.TagSwingingObstacle;
         TagTurningObstacle = GC.TagTurningObstacle;
+        TagCrouchingArea = GC.TagCrouchingArea;
         TagFinish = GC.TagFinish;
     }
 
@@ -91,7 +93,6 @@ public class PlayerController : MonoBehaviour
 
         if (other.gameObject.CompareTag(TagChangeBack))
         {
-            objectDone = true;
             swingingObjectCam.Priority = 9;
             turningObjectCam.Priority = 9;
             FailingCubes.RemoveAt(0);
@@ -100,9 +101,15 @@ public class PlayerController : MonoBehaviour
 
         if (other.gameObject.CompareTag(TagFinish))
         {
+            StartCoroutine(FinishingCor());
             finishCam.Priority = 11;
             playerAnimCont.SetTrigger("LevelEnd");
             splineFollower.enabled = false;
+        }
+
+        if (other.gameObject.CompareTag(TagCrouchingArea))
+        {
+            isCrouchingArea = true;
         }
     }
 
@@ -116,19 +123,42 @@ public class PlayerController : MonoBehaviour
         splineFollower.Restart(RestartPlaces[0]);
     }
 
+    IEnumerator FinishingCor()
+    {
+        yield return new WaitForSeconds(1.5f);
+        GC.completeLevel();
+    }
+
     void Movement()
     {
         if (isLevelStart && !isLevelDone && !isLevelFail)
         {
-            if (Input.GetMouseButton(0))
+            if (!isCrouchingArea)
             {
-                playerAnimCont.SetBool("isRunning", true);
-                splineFollower.enabled = true;
+                if (Input.GetMouseButton(0))
+                {
+                    playerAnimCont.SetBool("isRunning", true);
+                    splineFollower.enabled = true;
+                }
+                else
+                {
+                    playerAnimCont.SetBool("isRunning", false);
+                    splineFollower.enabled = false;
+                }
             }
             else
             {
-                playerAnimCont.SetBool("isRunning", false);
-                splineFollower.enabled = false;
+                if (Input.GetMouseButton(0))
+                {
+                   // playerAnimCont.SetBool("isRunning", true);
+                    playerAnimCont.SetBool("isCrouching", false);
+                    splineFollower.enabled = true;
+                }
+                else
+                {
+                    playerAnimCont.SetBool("isCrouching", true);
+                    splineFollower.enabled = false;
+                }
             }
         }
     }

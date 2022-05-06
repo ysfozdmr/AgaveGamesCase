@@ -23,14 +23,14 @@ public class AIScript : MonoBehaviour
     public bool isItPause;
 
     [Header("Tags")] string TagObstacle;
-    string TagTurningObstacle;
-    string TagSwingingObstacle;
     string TagChangeBack;
     string TagFinish;
+    string TagCrouchingArea;
 
     float timer;
     float timer2;
     private float random;
+    [SerializeField] private int failingCount;
 
     [Header("Movement Settings")] public float movementSpeed;
     Animator playerAnimCont;
@@ -70,44 +70,27 @@ public class AIScript : MonoBehaviour
     {
         TagObstacle = GC.TagObstacle;
         TagChangeBack = GC.TagChangeBack;
-        TagSwingingObstacle = GC.TagSwingingObstacle;
-        TagTurningObstacle = GC.TagTurningObstacle;
+        TagCrouchingArea = GC.TagCrouchingArea;
         TagFinish = GC.TagFinish;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         Ray ray = new Ray(transform.position, transform.forward);
 
         RaycastHit hit;
 
-      //  if (isItPause == false)
-        //{
-            if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out hit, 4))
+        if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out hit, 4))
+        {
+            if (hit.collider.gameObject.CompareTag(TagObstacle))
             {
-                if (hit.collider.gameObject.CompareTag(TagObstacle))
+                Debug.DrawRay(transform.position + Vector3.up, transform.forward);
+                if (state != State.Pause)
                 {
-                    Debug.DrawRay(transform.position + Vector3.up,transform.forward);
-                    if (state != State.Pause)
-                    {
-                        state = State.Pause;
-                    }
-                    
+                    state = State.Pause;
                 }
             }
-        //}
-      /*  else
-        {
-            if (timer > 0.1f)
-            {
-                timer = 0;
-                isItPause = false;
-            }
-
-           // Debug.Log(timer);
-
-            timer += Time.deltaTime;
-        }*/
+        }
     }
 
     public void CallingMovement()
@@ -138,6 +121,7 @@ public class AIScript : MonoBehaviour
         while (state == State.Pause)
         {
             splineFollower.enabled = false;
+
             if (timer > random)
             {
                 timer = 0;
@@ -147,6 +131,8 @@ public class AIScript : MonoBehaviour
 
 
             timer += Time.deltaTime;
+
+
             yield return new WaitForEndOfFrame();
         }
 
@@ -167,6 +153,7 @@ public class AIScript : MonoBehaviour
 
         if (other.gameObject.CompareTag(TagChangeBack))
         {
+            failingCount = 0;
             objectDone = true;
             FailingCubes.RemoveAt(0);
             RestartPlaces.RemoveAt(0);
@@ -183,6 +170,7 @@ public class AIScript : MonoBehaviour
     {
         yield return new WaitForSeconds(1.5f);
 
+        failingCount++;
         splineFollower.followSpeed = movementSpeed;
         playerAnimCont.enabled = true;
         transform.position = FailingCubes[0].gameObject.transform.position;
