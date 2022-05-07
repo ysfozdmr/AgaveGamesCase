@@ -11,6 +11,8 @@ TagManager:
   - TurningTrigger
   - CrouchingArea
   - Wheel
+  - WheelStep
+  - WaitState
   layers:
   - Default
   - TransparentFX

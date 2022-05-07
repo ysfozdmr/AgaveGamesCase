@@ -21,10 +21,13 @@ public class PlayerController : MonoBehaviour
     string TagCrouchingArea;
     string TagFinish;
     string TagWheel;
+    string TagWheelStep;
+    private string TagWaitState;
 
     [Header("Movement Settings")] public float movementSpeed;
     Animator playerAnimCont;
     SplineFollower splineFollower;
+    [SerializeField] private GameObject hips;
 
     [Header("Camera Settings")] public CinemachineVirtualCamera turningObjectCam;
     public CinemachineVirtualCamera swingingObjectCam;
@@ -70,6 +73,8 @@ public class PlayerController : MonoBehaviour
         TagTurningObstacle = GC.TagTurningObstacle;
         TagCrouchingArea = GC.TagCrouchingArea;
         TagWheel = GC.TagWheel;
+        TagWheelStep = GC.TagWheelStep;
+        TagWaitState = GC.TagWaitState;
         TagFinish = GC.TagFinish;
     }
 
@@ -83,10 +88,8 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject.CompareTag(TagObstacle))
         {
-            Debug.Log("sa");
             if (!isCrouching)
             {
-                Debug.Log("as");
                 splineFollower.followSpeed = 0f;
                 playerAnimCont.enabled = false;
                 StartCoroutine(FailingCor());
@@ -105,6 +108,10 @@ public class PlayerController : MonoBehaviour
 
         if (other.gameObject.CompareTag(TagChangeBack))
         {
+            gameObject.transform.SetParent(null);
+            GetComponent<Rigidbody>().freezeRotation = false;
+            hips.SetActive(true);
+            GetComponent<Rigidbody>().isKinematic = true;
             isCrouching = false;
             isCrouchingArea = false;
             for (int i = 0; i < Cams.Count; i++)
@@ -133,9 +140,16 @@ public class PlayerController : MonoBehaviour
 
         if (other.gameObject.CompareTag(TagWheel))
         {
+            hips.SetActive(false);
+            GetComponent<Rigidbody>().isKinematic = false;
             isWheeling = true;
             wheelCam.Priority = 11;
             splineFollower.enabled = false;
+        }
+
+        if (other.gameObject.CompareTag(TagWheelStep))
+        {
+            GetComponent<Rigidbody>().freezeRotation = true;
         }
     }
 
@@ -149,6 +163,10 @@ public class PlayerController : MonoBehaviour
                 playerAnimCont.enabled = false;
                 StartCoroutine(FailingCor());
             }
+        }
+        if (other.gameObject.CompareTag(TagWheelStep))
+        {
+            gameObject.transform.SetParent(other.gameObject.transform);
         }
     }
 
@@ -192,12 +210,11 @@ public class PlayerController : MonoBehaviour
                     if (Input.GetMouseButton(0))
                     {
                         playerAnimCont.SetBool("isRunning", true);
-                        transform.position+=-Vector3.forward/9;
+                        transform.position += -Vector3.forward / 9;
                     }
                     else
                     {
                         playerAnimCont.SetBool("isRunning", false);
-                        
                     }
                 }
             }

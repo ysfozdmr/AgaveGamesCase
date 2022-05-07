@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Dreamteck.Splines;
-using UnityEditor.VersionControl;
 using Random = UnityEngine.Random;
 
 public class AIScript : MonoBehaviour
@@ -13,7 +12,8 @@ public class AIScript : MonoBehaviour
     public enum State
     {
         Run,
-        Pause
+        Pause,
+        Wait
     }
 
     [Header("Bools")] public bool isLevelStart;
@@ -23,21 +23,26 @@ public class AIScript : MonoBehaviour
     public bool isItPause;
     public bool isCrouching;
     public bool isCrouchingArea;
+    private bool waitState;
 
     [Header("Tags")] string TagObstacle;
     string TagChangeBack;
     string TagFinish;
     string TagCrouchingArea;
     string TagWheel;
+    string TagWheelStep;
+    string TagWaitState;
 
     float timer;
-    float timer2;
     private float random;
     [SerializeField] private int failingCount;
+    
 
     [Header("Movement Settings")] public float movementSpeed;
     Animator playerAnimCont;
     SplineFollower splineFollower;
+    [SerializeField] private GameObject hips;
+    [SerializeField] private float speed;
 
     public List<float> RestartPlaces = new List<float>();
     public List<GameObject> FailingCubes = new List<GameObject>();
@@ -76,10 +81,21 @@ public class AIScript : MonoBehaviour
         TagChangeBack = GC.TagChangeBack;
         TagCrouchingArea = GC.TagCrouchingArea;
         TagWheel = GC.TagWheel;
+        TagWheelStep = GC.TagWheelStep;
+        TagWaitState = GC.TagWaitState;
         TagFinish = GC.TagFinish;
     }
 
     void Update()
+    {
+        Raycast();
+        if (waitState)
+        {
+            transform.position += -Vector3.forward / speed;
+        }
+    }
+
+    void Raycast()
     {
         RaycastHit hit;
 
@@ -192,6 +208,10 @@ public class AIScript : MonoBehaviour
 
         if (other.gameObject.CompareTag(TagChangeBack))
         {
+            gameObject.transform.SetParent(null);
+            GetComponent<Rigidbody>().freezeRotation = false;
+            hips.SetActive(true);
+            GetComponent<Rigidbody>().isKinematic = true;
             isCrouching = false;
             isCrouchingArea = false;
             FailingCubes.RemoveAt(0);
@@ -200,6 +220,7 @@ public class AIScript : MonoBehaviour
 
         if (other.gameObject.CompareTag(TagFinish))
         {
+            waitState = false;
             playerAnimCont.SetTrigger("LevelEnd");
             splineFollower.enabled = false;
         }
@@ -212,14 +233,32 @@ public class AIScript : MonoBehaviour
 
         if (other.gameObject.CompareTag(TagWheel))
         {
+            hips.SetActive(false);
+            GetComponent<Rigidbody>().isKinematic = false;
+            state = State.Wait;
+            waitState = true;
             splineFollower.enabled = false;
         }
+        if (other.gameObject.CompareTag(TagWheelStep))
+        {
+            waitState = false;
+            GetComponent<Rigidbody>().freezeRotation = true;
+            playerAnimCont.SetBool("isRunning", false);
+        }
+
+        if (other.gameObject.CompareTag(TagWaitState))
+        {
+            waitState = true;
+            playerAnimCont.SetBool("isRunning", true);
+        }
+        
     }
 
     private void OnTriggerStay(Collider other)
     {
         if (other.gameObject.CompareTag(TagObstacle))
         {
+            
             if (!isCrouching)
             {
                 splineFollower.followSpeed = 0f;
@@ -227,10 +266,15 @@ public class AIScript : MonoBehaviour
                 StartCoroutine(FailingCor());
             }
         }
+        if (other.gameObject.CompareTag(TagWheelStep))
+        {
+            gameObject.transform.SetParent(other.gameObject.transform);
+        }
     }
 
     IEnumerator FailingCor()
     {
+        Debug.Log("sa");
         yield return new WaitForSeconds(1.5f);
 
         failingCount++;
