@@ -14,6 +14,7 @@ public class UIController : MonoBehaviour
     [Header("Canvas Controller")]
     public GameObject levelStartPanel;
     public GameObject completeLevelPanel;
+    public GameObject levelFailPanel;
 
     GameController GC;
     PlayerController Player;

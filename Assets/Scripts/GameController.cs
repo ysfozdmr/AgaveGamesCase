@@ -55,10 +55,20 @@ public class GameController : MonoBehaviour
     void sendLevelStart()
     {
         UI.isLevelStart = true;
-        //UI.inGamePanel.SetActive(true);
+
         isLevelStart = true;
         player.isLevelStart = true;
-        AI.isLevelStart = true;
+    }
+    public void levelFail()
+    {
+        UI.levelFailPanel.SetActive(true);
+        isLevelFail = true;
+        UI.isLevelFail = true;
+    }
+    public void Restart()
+    {
+        PlayerPrefs.SetInt("tryNum", tryNum++);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
     public void completeLevel()
     {

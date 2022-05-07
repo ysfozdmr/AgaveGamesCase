@@ -36,7 +36,7 @@ public class AIScript : MonoBehaviour
     float timer;
     private float random;
     [SerializeField] private int failingCount;
-    
+
 
     [Header("Movement Settings")] public float movementSpeed;
     Animator playerAnimCont;
@@ -220,9 +220,8 @@ public class AIScript : MonoBehaviour
 
         if (other.gameObject.CompareTag(TagFinish))
         {
-            waitState = false;
-            playerAnimCont.SetTrigger("LevelEnd");
-            splineFollower.enabled = false;
+            StartCoroutine(FinishingCor());
+
         }
 
         if (other.gameObject.CompareTag(TagCrouchingArea))
@@ -239,6 +238,7 @@ public class AIScript : MonoBehaviour
             waitState = true;
             splineFollower.enabled = false;
         }
+
         if (other.gameObject.CompareTag(TagWheelStep))
         {
             waitState = false;
@@ -251,14 +251,12 @@ public class AIScript : MonoBehaviour
             waitState = true;
             playerAnimCont.SetBool("isRunning", true);
         }
-        
     }
 
     private void OnTriggerStay(Collider other)
     {
         if (other.gameObject.CompareTag(TagObstacle))
         {
-            
             if (!isCrouching)
             {
                 splineFollower.followSpeed = 0f;
@@ -266,10 +264,22 @@ public class AIScript : MonoBehaviour
                 StartCoroutine(FailingCor());
             }
         }
+
         if (other.gameObject.CompareTag(TagWheelStep))
         {
             gameObject.transform.SetParent(other.gameObject.transform);
         }
+    }
+
+    IEnumerator FinishingCor()
+    {
+        player.GetComponent<SplineFollower>().enabled = false;
+        player.GetComponent<Animator>().SetBool("isRunning",false);
+        waitState = false;
+        playerAnimCont.SetTrigger("LevelEnd");
+        splineFollower.enabled = false;
+        yield return new WaitForSeconds(1.5f);
+        GC.levelFail();
     }
 
     IEnumerator FailingCor()
